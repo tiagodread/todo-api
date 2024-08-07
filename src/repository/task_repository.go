@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"todo-api/model"
+	"todo-api/src/model"
 )
 
 type TaskRepository struct {

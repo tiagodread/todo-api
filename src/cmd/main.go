@@ -1,10 +1,10 @@
 package main
 
 import (
-	"todo-api/controller"
-	"todo-api/db"
-	"todo-api/repository"
-	"todo-api/usecase"
+	"todo-api/src/controller"
+	"todo-api/src/db"
+	"todo-api/src/repository"
+	"todo-api/src/usecase"
 
 	"github.com/gin-gonic/gin"
 )

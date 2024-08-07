@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"todo-api/model"
-	"todo-api/repository"
+	"todo-api/src/model"
+	"todo-api/src/repository"
 )
 
 type TaskUseCase struct {

@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 	"strconv"
-	"todo-api/model"
-	"todo-api/usecase"
+	"todo-api/src/model"
+	"todo-api/src/usecase"
 
 	"github.com/gin-gonic/gin"
 )
