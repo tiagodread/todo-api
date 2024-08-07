@@ -26,8 +26,9 @@ func main() {
 	TaskController := controller.NewTaskController(TaskUseCase)
 
 	server.GET("/tasks", TaskController.GetTasks)
-
+	server.GET("/task/:id", TaskController.GetTask)
 	server.POST("/task", TaskController.CreateTask)
+	server.DELETE("/task/:id", TaskController.DeleteTask)
 
 	server.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{

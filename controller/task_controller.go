@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 	"todo-api/model"
 	"todo-api/usecase"
 
@@ -28,6 +28,17 @@ func (p *TaskController) GetTasks(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, tasks)
 }
 
+func (p *TaskController) GetTask(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	task, err := p.TaskUseCase.GetTask(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, task)
+}
+
 func (p *TaskController) CreateTask(ctx *gin.Context) {
 	var task model.Task
 	err := ctx.BindJSON(&task)
@@ -36,8 +47,6 @@ func (p *TaskController) CreateTask(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(task)
-
 	insertedTask, err := p.TaskUseCase.CreateTask(task)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -45,5 +54,22 @@ func (p *TaskController) CreateTask(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, insertedTask)
+}
 
+func (p *TaskController) DeleteTask(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+
+	task, err := p.TaskUseCase.GetTask(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, err)
+		return
+	}
+
+	err = p.TaskUseCase.DeleteTask(task.Id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, model.Task{})
 }
