@@ -1,20 +1,37 @@
-# Use postgres/example user/password credentials
-version: '3.9'
-
 services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://postgres:1234@db:5432/postgres?sslmode=disable
+      GIN_MODE: release
+    depends_on:
+      - db
+    networks:
+      - todo-network
 
   db:
     image: postgres
     container_name: database
     restart: always
     ports:
-    - "5432:5432"
+      - "5432:5432"
     volumes:
-     - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: 1234
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
+    networks:
+      - todo-network
 
 volumes:
   pgdata: {}
+
+networks:
+  todo-network:
+    driver: bridge
