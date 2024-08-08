@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: todo-api-config
 data:
-  DATABASE_URL: "postgres://postgres:1234@localhost:5432/postgres?sslmode=disable"
+  DATABASE_URL: "postgres://postgres:1234@db:5432/postgres?sslmode=disable"
   GIN_MODE: release

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: todo-api
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: todo-api
@@ -13,14 +13,14 @@ spec:
         app: todo-api
     spec:
       containers:
-      - name: todo-api
-        image: todo-api-api:latest
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 8080
-        envFrom:
-        - configMapRef:
-            name: todo-api-config
+        - name: todo-api
+          image: tiagodreadd/todo-api-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: todo-api-config
 ---
 apiVersion: v1
 kind: Service
@@ -34,4 +34,3 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-  type: ClusterIP

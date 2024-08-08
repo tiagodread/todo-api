@@ -1,0 +1,4 @@
+FROM postgres
+
+# Executing SQL file on startup
+COPY initdb.sql /docker-entrypoint-initdb.d/
