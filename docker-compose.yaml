@@ -1,6 +1,5 @@
 services:
   api:
-    platform: linux/amd64
     image: tiagodreadd/todo-api:latest
     restart: always
     ports:
@@ -14,7 +13,6 @@ services:
       - todo-network
 
   db:
-    platform: linux/amd64
     image: tiagodreadd/todo-db:latest
     container_name: database
     restart: always
