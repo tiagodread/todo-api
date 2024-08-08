@@ -1,7 +1,7 @@
 name: Build App
 
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
 
 jobs:
@@ -44,11 +44,11 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:${{ github.sha }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:latest
 
     - name: Build and push todo-db
       uses: docker/build-push-action@v6
       with:
         file: Dockerfile.db
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-db:${{ github.sha }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-db:latest
