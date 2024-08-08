@@ -1,8 +1,6 @@
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: tiagodreadd/todo-api-api:latest
     restart: always
     ports:
       - "8080:8080"
@@ -15,14 +13,14 @@ services:
       - todo-network
 
   db:
-    image: postgres
+    image: tiagodreadd/todo-api-db:latest
     container_name: database
     restart: always
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./initdb.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: 1234
       POSTGRES_USER: postgres
