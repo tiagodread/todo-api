@@ -1,6 +1,6 @@
 services:
   api:
-    image: tiagodreadd/todo-api-api:latest
+    image: tiagodreadd/todo-api:latest
     restart: always
     ports:
       - "8080:8080"
@@ -13,7 +13,7 @@ services:
       - todo-network
 
   db:
-    image: tiagodreadd/todo-api-db:latest
+    image: tiagodreadd/todo-db:latest
     container_name: database
     restart: always
     ports:

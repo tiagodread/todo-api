@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: todo-api
-          image: tiagodreadd/todo-api-api:latest
+          image: tiagodreadd/todo-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

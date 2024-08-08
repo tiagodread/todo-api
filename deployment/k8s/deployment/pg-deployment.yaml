@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: tiagodreadd/todo-api-db:latest
+          image: tiagodreadd/todo-db:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5432
