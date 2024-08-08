@@ -1,6 +1,10 @@
 services:
   api:
-    image: tiagodreadd/todo-api:latest
+    image: tiagodreadd/todo-api
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "8080:8080"
@@ -13,7 +17,11 @@ services:
       - todo-network
 
   db:
-    image: tiagodreadd/todo-db:latest
+    image: tiagodreadd/todo-db
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: Dockerfile.db
     container_name: database
     restart: always
     ports:

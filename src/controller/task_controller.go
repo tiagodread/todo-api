@@ -73,3 +73,42 @@ func (p *TaskController) DeleteTask(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusNoContent, model.Task{})
 }
+
+func (p *TaskController) UpdateTask(ctx *gin.Context) {
+	var newTask = model.Task{}
+	id := ctx.Params.ByName("id")
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+
+	parsedId, _ := strconv.Atoi(id)
+
+	updatedTask, err := p.TaskUseCase.GetTask(parsedId)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, err)
+		return
+	}
+
+	err = ctx.BindJSON(&newTask)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, nil)
+		return
+	}
+
+	updatedTask.Title = newTask.Title
+	updatedTask.Description = newTask.Description
+	updatedTask.IsCompleted = newTask.IsCompleted
+	updatedTask.CompletedAt = newTask.CompletedAt
+	updatedTask.RewardInSats = newTask.RewardInSats
+
+	updatedTaskId, err := p.TaskUseCase.UpdateTask(newTask)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	updatedTask, _ = p.TaskUseCase.GetTask(updatedTaskId)
+
+	ctx.JSON(http.StatusOK, updatedTask)
+}

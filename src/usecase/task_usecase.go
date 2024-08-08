@@ -43,3 +43,11 @@ func (pu *TaskUseCase) DeleteTask(id int) error {
 	}
 	return nil
 }
+
+func (pu *TaskUseCase) UpdateTask(task model.Task) (int, error) {
+	id, err := pu.repository.UpdateTask(task)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
