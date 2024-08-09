@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"time"
 	"todo-api/src/model"
 )
 
@@ -122,20 +123,28 @@ func (pr *TaskRepository) DeleteTask(id int) error {
 }
 
 func (pr *TaskRepository) UpdateTask(task model.Task) (int, error) {
-	var id int
+
+	var customUpdatedAt *time.Time
+
+	if task.CompletedAt.Val.IsZero() {
+		customUpdatedAt = nil
+	} else {
+		customUpdatedAt = &task.CompletedAt.Val
+	}
 
 	query, err := pr.connection.Prepare("UPDATE task " +
-		"SET title = $1, description = $2, created_at = $3, is_completed = $4, reward_in_sats = $5" +
-		" WHERE id = $6 RETURNING id")
+		"SET title = $1, description = $2, created_at = $3,  completed_at = $4, is_completed = $5, reward_in_sats = $6" +
+		" WHERE id = $7 RETURNING id")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	err = query.QueryRow(task.Title, task.Description, task.CreatedAt, task.IsCompleted, task.RewardInSats, task.Id).Scan(&id)
+	_, err = query.Query(task.Title, task.Description, task.CreatedAt, customUpdatedAt, task.IsCompleted, task.RewardInSats, task.Id)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
 	}
+
 	query.Close()
-	return id, nil
+	return task.Id, nil
 }

@@ -13,5 +13,5 @@ type Task struct {
 	CreatedAt    time.Time                  `json:"created_at"`
 	CompletedAt  gonull.Nullable[time.Time] `json:"completed_at"`
 	IsCompleted  bool                       `json:"is_completed"`
-	RewardInSats int                        `json:"rewards_in_sats"`
+	RewardInSats int                        `json:"reward_in_sats"`
 }

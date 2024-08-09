@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"time"
 	"todo-api/src/model"
 	"todo-api/src/usecase"
 
@@ -84,7 +85,7 @@ func (p *TaskController) UpdateTask(ctx *gin.Context) {
 
 	parsedId, _ := strconv.Atoi(id)
 
-	updatedTask, err := p.TaskUseCase.GetTask(parsedId)
+	currentTask, err := p.TaskUseCase.GetTask(parsedId)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, err)
 		return
@@ -96,19 +97,27 @@ func (p *TaskController) UpdateTask(ctx *gin.Context) {
 		return
 	}
 
-	updatedTask.Title = newTask.Title
-	updatedTask.Description = newTask.Description
-	updatedTask.IsCompleted = newTask.IsCompleted
-	updatedTask.CompletedAt = newTask.CompletedAt
-	updatedTask.RewardInSats = newTask.RewardInSats
+	currentTask.Title = newTask.Title
+	currentTask.Description = newTask.Description
+	currentTask.RewardInSats = newTask.RewardInSats
+	currentTask.IsCompleted = newTask.IsCompleted
 
-	updatedTaskId, err := p.TaskUseCase.UpdateTask(newTask)
+	if newTask.IsCompleted {
+		currentTask.CompletedAt.Val = time.Now()
+		currentTask.CompletedAt.Valid = true
+	}
+
+	if !newTask.IsCompleted {
+		currentTask.CompletedAt.Val = time.Time{}
+	}
+
+	updatedTaskId, err := p.TaskUseCase.UpdateTask(currentTask)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	updatedTask, _ = p.TaskUseCase.GetTask(updatedTaskId)
+	updatedTask, _ := p.TaskUseCase.GetTask(updatedTaskId)
 
 	ctx.JSON(http.StatusOK, updatedTask)
 }
