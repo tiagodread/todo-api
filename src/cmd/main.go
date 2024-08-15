@@ -30,6 +30,7 @@ func main() {
 	server.POST("/task", TaskController.CreateTask)
 	server.PUT("/task/:id", TaskController.UpdateTask)
 	server.DELETE("/task/:id", TaskController.DeleteTask)
+	server.DELETE("/tasks", TaskController.DeleteTasks)
 
 	server.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{

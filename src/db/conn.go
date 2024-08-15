@@ -10,13 +10,19 @@ import (
 )
 
 func ConnectDB() (*sql.DB, error) {
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
+	POSTGRES_PASSWORD := os.Getenv("POSTGRES_PASSWORD")
+	POSTGRES_USER := os.Getenv("POSTGRES_USER")
+	POSTGRES_DB := os.Getenv("POSTGRES_DB")
+	POSTGRES_HOST := os.Getenv("POSTGRES_HOST")
+
+	DATABASE_URL := fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable", POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_DB)
+
+	if DATABASE_URL == "" {
 		log.Fatal("DATABASE_URL is not set")
 	}
 
-	fmt.Print(databaseURL)
-	db, err := sql.Open("postgres", databaseURL)
+	fmt.Print(DATABASE_URL)
+	db, err := sql.Open("postgres", DATABASE_URL)
 
 	if err != nil {
 		panic(err)
@@ -26,8 +32,6 @@ func ConnectDB() (*sql.DB, error) {
 	if err != nil {
 		panic(err)
 	}
-
-	// fmt.Printf("Connected to %s", dbname)
 
 	return db, nil
 }

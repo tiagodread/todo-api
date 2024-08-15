@@ -3,27 +3,56 @@ name: Build App
 on:
   pull_request:
     branches: [ "main" ]
+env:
+  SHA: ${{ github.sha }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+  POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
 
 jobs:
-  build-and-test:
+  run-api-tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22.5'
+    - name: Start containers
+      run: | 
+        docker compose build
+        docker image ls
+        docker compose up -d --force-recreate
 
-    - name: Build
-      run: go build -v ./...
+    - name: Wait for containers
+      run: |
+        docker ps
+        docker logs database
+        max_attempts=3
+        attempt=1
+
+        while [ $attempt -le $max_attempts ]; do
+          if curl -s http://localhost:8080/health | grep -q '"status":"OK"'; then
+            echo "Container is up and healthy!"
+            break
+          else
+            echo "Attempt $attempt/$max_attempts: Waiting for container..."
+            attempt=$((attempt + 1))
+            if [ $attempt -le $max_attempts ]; then
+              sleep 60  # Wait for 60 seconds before the next attempt
+            fi
+          fi
+        done
+
+        if [ $attempt -gt $max_attempts ]; then
+          echo "Container failed to become healthy after $max_attempts attempts."
+          exit 1
+        fi
 
     - name: Test
       run: go test -v ./...
 
-  build-docker-image:
+  build-push-docker-image:
     runs-on: ubuntu-latest
-    needs: build-and-test
+    needs: run-api-tests
     steps:
     - uses: actions/checkout@v4
     
@@ -37,11 +66,13 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:${{ github.sha }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:${{ env.SHA }}
 
     - name: Build and push todo-db
       uses: docker/build-push-action@v6
       with:
         file: Dockerfile.db
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-db:${{ github.sha }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-db:${{ env.SHA }}
+
+
