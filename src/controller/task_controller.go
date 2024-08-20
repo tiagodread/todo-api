@@ -44,7 +44,7 @@ func (p *TaskController) CreateTask(ctx *gin.Context) {
 	var task model.Task
 	err := ctx.BindJSON(&task)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -67,6 +67,16 @@ func (p *TaskController) DeleteTask(ctx *gin.Context) {
 	}
 
 	err = p.TaskUseCase.DeleteTask(task.Id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(http.StatusNoContent, model.Task{})
+}
+
+func (p *TaskController) DeleteTasks(ctx *gin.Context) {
+	err := p.TaskUseCase.DeleteTasks()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return

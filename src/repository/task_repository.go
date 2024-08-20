@@ -122,6 +122,19 @@ func (pr *TaskRepository) DeleteTask(id int) error {
 	return nil
 }
 
+func (pr *TaskRepository) DeleteTasks() error {
+	query := fmt.Sprintf("DELETE FROM task")
+
+	rows, err := pr.connection.Query(query)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	fmt.Print(rows)
+	return nil
+}
+
 func (pr *TaskRepository) UpdateTask(task model.Task) (int, error) {
 
 	var customUpdatedAt *time.Time
