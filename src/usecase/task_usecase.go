@@ -15,8 +15,8 @@ func NewTaskUseCase(repo repository.TaskRepository) TaskUseCase {
 	}
 }
 
-func (pu *TaskUseCase) GetTasks() ([]model.Task, error) {
-	return pu.repository.GetTasks()
+func (pu *TaskUseCase) GetTasks(completed bool) ([]model.Task, error) {
+	return pu.repository.GetTasks(completed)
 }
 
 func (pu *TaskUseCase) GetTask(id int) (model.Task, error) {

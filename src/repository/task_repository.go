@@ -17,8 +17,8 @@ func NewTaskRepository(connection *sql.DB) TaskRepository {
 	}
 }
 
-func (pr *TaskRepository) GetTasks() ([]model.Task, error) {
-	query := "SELECT * FROM task"
+func (pr *TaskRepository) GetTasks(completed bool) ([]model.Task, error) {
+	query := fmt.Sprintf("SELECT * FROM task WHERE is_completed = %v", completed)
 
 	rows, err := pr.connection.Query(query)
 	if err != nil {
