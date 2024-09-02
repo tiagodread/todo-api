@@ -21,7 +21,9 @@ func NewTaskController(usecase usecase.TaskUseCase) TaskController {
 }
 
 func (p *TaskController) GetTasks(ctx *gin.Context) {
-	tasks, err := p.TaskUseCase.GetTasks()
+	completed, _ := strconv.ParseBool(ctx.Query("completed"))
+
+	tasks, err := p.TaskUseCase.GetTasks(completed)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 	}
