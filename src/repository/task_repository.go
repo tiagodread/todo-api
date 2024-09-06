@@ -18,7 +18,7 @@ func NewTaskRepository(connection *sql.DB) TaskRepository {
 }
 
 func (pr *TaskRepository) GetTasks(completed bool) ([]model.Task, error) {
-	query := fmt.Sprintf("SELECT * FROM task WHERE is_completed = %v", completed)
+	query := fmt.Sprintf("SELECT * FROM task WHERE is_completed = %v ORDER BY created_at ASC", completed)
 
 	rows, err := pr.connection.Query(query)
 	if err != nil {
@@ -44,6 +44,7 @@ func (pr *TaskRepository) GetTasks(completed bool) ([]model.Task, error) {
 		&taskObj.CompletedAt,
 		&taskObj.IsCompleted,
 		&taskObj.RewardInSats,
+		&taskObj.DueDate,
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -61,6 +62,7 @@ func (pr *TaskRepository) GetTasks(completed bool) ([]model.Task, error) {
 			&taskObj.CompletedAt,
 			&taskObj.IsCompleted,
 			&taskObj.RewardInSats,
+			&taskObj.DueDate,
 		)
 		if err != nil {
 			fmt.Println(err)
@@ -82,7 +84,7 @@ func (pr *TaskRepository) GetTask(id int) (model.Task, error) {
 	var task model.Task
 	query := "SELECT * FROM task WHERE id=$1"
 	row := pr.connection.QueryRow(query, id)
-	switch err := row.Scan(&task.Id, &task.Title, &task.Description, &task.CreatedAt, &task.CompletedAt, &task.IsCompleted, &task.RewardInSats); err {
+	switch err := row.Scan(&task.Id, &task.Title, &task.Description, &task.CreatedAt, &task.CompletedAt, &task.IsCompleted, &task.RewardInSats, &task.DueDate); err {
 	case sql.ErrNoRows:
 		return model.Task{}, sql.ErrNoRows
 	}
@@ -94,13 +96,13 @@ func (pr *TaskRepository) CreateTask(task model.Task) (int, error) {
 	var id int
 
 	query, err := pr.connection.Prepare("INSERT INTO task" +
-		"(title, description, created_at, is_completed, reward_in_sats)" +
-		" VALUES ($1, $2, $3, $4, $5) RETURNING id")
+		"(title, description, created_at, is_completed, reward_in_sats, due_date)" +
+		" VALUES ($1, $2, $3, $4, $5, $6) RETURNING id")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	err = query.QueryRow(task.Title, task.Description, task.CreatedAt, task.IsCompleted, task.RewardInSats).Scan(&id)
+	err = query.QueryRow(task.Title, task.Description, task.CreatedAt, task.IsCompleted, task.RewardInSats, task.DueDate).Scan(&id)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
@@ -146,13 +148,13 @@ func (pr *TaskRepository) UpdateTask(task model.Task) (int, error) {
 	}
 
 	query, err := pr.connection.Prepare("UPDATE task " +
-		"SET title = $1, description = $2, created_at = $3,  completed_at = $4, is_completed = $5, reward_in_sats = $6" +
-		" WHERE id = $7 RETURNING id")
+		"SET title = $1, description = $2, created_at = $3,  completed_at = $4, is_completed = $5, reward_in_sats = $6, due_date = $7" +
+		" WHERE id = $8 RETURNING id")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	_, err = query.Query(task.Title, task.Description, task.CreatedAt, customUpdatedAt, task.IsCompleted, task.RewardInSats, task.Id)
+	_, err = query.Query(task.Title, task.Description, task.CreatedAt, customUpdatedAt, task.IsCompleted, task.RewardInSats, task.DueDate, task.Id)
 	if err != nil {
 		fmt.Println(err)
 		return 0, err
