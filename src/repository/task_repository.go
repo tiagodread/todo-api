@@ -18,7 +18,7 @@ func NewTaskRepository(connection *sql.DB) TaskRepository {
 }
 
 func (pr *TaskRepository) GetTasks(completed bool) ([]model.Task, error) {
-	query := fmt.Sprintf("SELECT * FROM task WHERE is_completed = %v ORDER BY created_at ASC", completed)
+	query := fmt.Sprintf("SELECT * FROM task WHERE is_completed = %v ORDER BY created_at DESC", completed)
 
 	rows, err := pr.connection.Query(query)
 	if err != nil {
